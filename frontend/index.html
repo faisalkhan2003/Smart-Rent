@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>House Rent Prediction with Gemini AI</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #00c6ff, #0072ff);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #e0e0e0;
+      margin-top: 0;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    input, select, button {
+      padding: 0.8rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    input, select {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #222;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #0072ff;
+    }
+
+    button {
+      background-color: #6a11cb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005ae0;
+    }
+
+    #output {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Smart Rent</h1>
+
+    <form id="rentForm">
+      <input type="text" id="location" placeholder="Location (e.g. Delhi)" required>
+      <input type="number" id="area" placeholder="Area (sq ft)" required>
+      <select id="bhk" required>
+        <option value="" disabled selected>BHK</option>
+        <option value="1">1 BHK</option>
+        <option value="2">2 BHK</option>
+        <option value="3">3 BHK</option>
+        <option value="4">4+ BHK</option>
+      </select>
+      <select id="furnishing" required>
+        <option value="" disabled selected>Furnishing</option>
+        <option value="Furnished">Furnished</option>
+        <option value="Semi-Furnished">Semi-Furnished</option>
+        <option value="Unfurnished">Unfurnished</option>
+      </select>
+      <button type="submit">Predict Rent</button>
+    </form>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    document.getElementById("rentForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const location = document.getElementById("location").value;
+      const area = document.getElementById("area").value;
+      const bhk = document.getElementById("bhk").value;
+      const furnishing = document.getElementById("furnishing").value;
+      const output = document.getElementById("output");
+
+      const prompt = `You are Smart Rent Buddy. Predict the monthly rent for a ${bhk} BHK, ${furnishing} house in ${location} with ${area} square feet area. Respond only with the rent in INR, Also explain why this rent is coming for this area and specification explain briefly.`;
+      function formatGeminiOutput(rawText) {
+  const rentMatch = rawText.match(/^₹[\d,]+/);
+  const rent = rentMatch ? `<p><strong>Estimated Rent: ${rentMatch[0]}</strong></p>` : "";
+
+  const rest = rawText.replace(/^₹[\d,]+\s*/, "");
+
+  let formatted = rest.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  formatted = formatted
+    .filter(p => p.trim() !== "")
+    .map(p => `<p>${p.trim()}</p>`)
+    .join("");
+
+  return rent + formatted;
+}
+  
+      output.textContent = "Predicting...";
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/gemini-api", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: prompt })
+        });
+
+        const result = await res.json();
+        if (result.prediction) {
+          const outputPred = formatGeminiOutput(result.prediction)  
+          output.innerHTML = `<div style="color:#6a11cb;">${outputPred}</div>`;
+        } else {
+          output.textContent = "Prediction failed.";
+        }
+      } catch (err) {
+        console.error(err);
+        output.textContent = "Error contacting Gemini AI.";
+      }
+    });
+  </script>
+</body>
+</html>
