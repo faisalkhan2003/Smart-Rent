@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #031c23, #0072ff);
+      background-color: #90be6d;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -17,7 +17,7 @@
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.1);
+      background: #06d6a0;
       padding: 2rem;
       border-radius: 16px;
       width: 100%;
@@ -31,7 +31,7 @@
     }
 
     p {
-      color: #e0e0e0;
+      color: #590d22;
       margin-top: 0;
     }
 
@@ -55,25 +55,25 @@
     }
 
     input:focus, select:focus {
-      outline: 2px solid #0072ff;
+      outline: 2px solid hwb(214 4% 93%);
     }
 
     button {
-      background-color: #6a11cb;
-      color: white;
+      background-color: #f9844a;
+      color: #001524;
       cursor: pointer;
       font-weight: bold;
       transition: background 0.3s ease;
     }
 
     button:hover {
-      background-color: #005ae0;
+      background-color: #0e9594;
     }
 
     #output {
       margin-top: 1.5rem;
       font-size: 1.2rem;
-      color: #fff;
+      color: #590d22;
       font-weight: bold;
     }
   </style>
@@ -114,7 +114,7 @@
       const furnishing = document.getElementById("furnishing").value;
       const output = document.getElementById("output");
 
-      const prompt = `You are Smart Rent Buddy. Predict the monthly rent for a ${bhk} BHK, ${furnishing} house in ${location} with ${area} square feet area. Respond only with the rent in INR, Also explain why this rent is coming for this area and specification explain briefly.`;
+      const prompt = `You are Smart Rent Buddy. Predict the monthly rent for a ${bhk} BHK, ${furnishing} house in ${location} with ${area} square feet area. Respond only with the rent in INR, Also explain why this rent is coming for this area and specification explain briefly in 60 to 70 words, put rupees symbol in price and change the line after the price.`;
       function formatGeminiOutput(rawText) {
   const rentMatch = rawText.match(/^₹[\d,]+/);
   const rent = rentMatch ? `<p><strong>Estimated Rent: ${rentMatch[0]}</strong></p>` : "";
@@ -141,7 +141,7 @@
         
         if (result.prediction) {
           const outputPred = formatGeminiOutput(result.prediction)  
-          output.innerHTML = `<div style="color:#6a11cb;">${outputPred}</div>`;
+          output.innerHTML = `<div>${outputPred}</div>`;
         } else {
           output.textContent = "Prediction failed.";
         }
