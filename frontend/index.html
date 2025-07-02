@@ -130,7 +130,7 @@
       output.textContent = "Predicting...";
 
       try {
-        const res = await fetch("http://127.0.0.1:5000/gemini-api", {
+        const res = await fetch("https://smart-rent-1gvr.onrender.com/gemini-api", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt: prompt })
